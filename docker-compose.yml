@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  mongo:
+    image: mongo
+    environment:
+      # MONGO_INITDB_ROOT_USERNAME: 
+      # MONGO_INITDB_ROOT_PASSWORD: 
+      # MONGO_INITDB_DATABASE: 
+    ports:
+      - "27017:27017"
+
+  mongo-express:
+    image: mongo-express
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongo
+      # ME_CONFIG_MONGODB_AUTH_DATABASE: 
+      # ME_CONFIG_MONGODB_AUTH_USERNAME: 
+      # ME_CONFIG_MONGODB_AUTH_PASSWORD: 
+      # ME_CONFIG_BASICAUTH_USERNAME: kevinadmindayo
+      # ME_CONFIG_BASICAUTH_PASSWORD: kevinbadpassword
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: 'true'
+      ME_CONFIG_OPTIONS_READONLY: 'false'
+      ME_CONFIG_OPTIONS_NO_DELETE: 'false'
+    links:
+      - mongo
+    ports:
+      - "27018:8081"

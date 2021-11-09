@@ -1,0 +1,77 @@
+# https://github.com/mongo-express/mongo-express
+# https://hub.docker.com/_/mongo-express
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongoexpress
+  namespace: myservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongoexpress
+  template:
+    metadata:
+      labels:
+        app: mongoexpress
+    spec:
+      containers:
+      - name: mongoexpress
+        image: mongo-express:latest
+        # imagePullPolicy: Always
+        ports:
+        - containerPort: 8081
+        env:
+        - name: ME_CONFIG_MONGODB_URL
+          # value: mongodb://admin:pass@localhost:27017/db?ssl=false
+          value: mongodb://mongo
+        - name: ME_CONFIG_BASICAUTH_USERNAME
+          value: kevinadmindayo
+        - name: ME_CONFIG_BASICAUTH_USERNAME
+          value: kevinbadpassword
+        # - name: ME_CONFIG_MONGODB_AUTH_USERNAME
+        #   value: kevinadmindayo
+        # - name: ME_CONFIG_MONGODB_AUTH_PASSWORD
+        #   value: kevinbadpassword
+        - name: ME_CONFIG_MONGODB_ENABLE_ADMIN
+          value: "false"
+        - name: ME_CONFIG_OPTIONS_READONLY
+          value: "true"
+        - name: ME_CONFIG_OPTIONS_NO_DELETE
+          value: "true"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongoexpress
+  namespace: myservice
+spec:
+  ports:
+  - port: 8081
+  selector:
+    app: mongoexpress
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: mongoexpress
+  namespace: myservice
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod" # connect to the certificate issuer
+spec:
+  tls:
+  - hosts:
+    - mongoexpress.kevin-asobi.com
+    secretName: mongoexpress
+  rules:
+  - host: mongoexpress.kevin-asobi.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: mongoexpress
+          servicePort: 8081
