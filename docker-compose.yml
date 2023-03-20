@@ -1,28 +1,32 @@
 version: '3'
 
 services:
-  mongo:
+  mymongo:
     image: mongo
     environment:
-      # MONGO_INITDB_ROOT_USERNAME: 
-      # MONGO_INITDB_ROOT_PASSWORD: 
-      # MONGO_INITDB_DATABASE: 
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    networks:
+      - mymongo_network
     ports:
-      - "27017:27017"
+      - "17017:27017"
+    volumes:
+      - ./data/mongodb_data:/data/db
+      - ./data/configdb:/data/configdb
 
-  mongo-express:
+  mymongo-express:
     image: mongo-express
     environment:
       ME_CONFIG_MONGODB_URL: mongodb://mongo
-      # ME_CONFIG_MONGODB_AUTH_DATABASE: 
-      # ME_CONFIG_MONGODB_AUTH_USERNAME: 
-      # ME_CONFIG_MONGODB_AUTH_PASSWORD: 
-      # ME_CONFIG_BASICAUTH_USERNAME: kevinadmindayo
-      # ME_CONFIG_BASICAUTH_PASSWORD: kevinbadpassword
-      ME_CONFIG_MONGODB_ENABLE_ADMIN: 'true'
-      ME_CONFIG_OPTIONS_READONLY: 'false'
-      ME_CONFIG_OPTIONS_NO_DELETE: 'false'
-    links:
-      - mongo
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_SERVER: mymongo
+    networks:
+      - mymongo_network
     ports:
-      - "27018:8081"
+      - "17018:8081"
+    depends_on:
+      - mymongo
+
+networks:
+  mymongo_network
