@@ -1,32 +1,32 @@
-version: '3'
-
+version: '3.8'
 services:
-  mymongo:
-    image: mongo
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password
+  mongodb:
+    image: mongo:latest
+    restart: always
+    ports:
+      - 17017:27017
     networks:
       - mymongo_network
-    ports:
-      - "17017:27017"
     volumes:
       - ./data/mongodb_data:/data/db
       - ./data/configdb:/data/configdb
-
-  mymongo-express:
-    image: mongo-express
     environment:
-      ME_CONFIG_MONGODB_URL: mongodb://mongo
-      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: password
-      ME_CONFIG_MONGODB_SERVER: mymongo
+      MONGO_INITDB_ROOT_USERNAME: username
+      MONGO_INITDB_ROOT_PASSWORD: password
+
+  mongo-express:
+    image: mongo-express:latest
+    restart: always
+    depends_on:
+      - mongodb
+    ports:
+      - 17018:8081
     networks:
       - mymongo_network
-    ports:
-      - "17018:8081"
-    depends_on:
-      - mymongo
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: username
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_SERVER: mongodb
 
 networks:
-  mymongo_network
+  mymongo_network:
